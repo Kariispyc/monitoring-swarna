@@ -13,30 +13,50 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans pb-16">
 
-    <!-- Header Navigation -->
-    <header class="bg-emerald-700 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <!-- Logo SWARNA -->
-                <img src="{{ asset('images/logo-swarna.jpg') }}" 
-                     alt="Logo SWARNA" 
-                     class="h-10 w-10 object-contain rounded-full bg-white p-0.5 shadow-sm"
-                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=SWARNA&background=10b981&color=fff';">
-                <div>
-                    <h1 class="text-base md:text-xl font-bold tracking-wide leading-tight">SWARNA</h1>
-                    <p class="text-[11px] text-emerald-200">Smart Farming Warnasari &bull; PPK Ormawa Bem Fakultas Saintek UMMI</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <a href="#profil-tim" class="bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
-                    <i class="fa-solid fa-users mr-1"></i> Tim Kami
-                </a>
-                <a href="{{ route('export.csv') }}" class="bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center shadow-sm transition">
-                    <i class="fa-solid fa-file-excel mr-1"></i> Rekap Data
-                </a>
+<!-- Header Navigation -->
+<header class="bg-emerald-700 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 flex justify-between items-center gap-2">
+        
+        <!-- Logo & Branding -->
+        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            <img src="{{ asset('images/logo-swarna.jpg') }}" 
+                 alt="Logo SWARNA" 
+                 class="h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-full bg-white p-0.5 shadow-sm shrink-0"
+                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=SWARNA&background=10b981&color=fff';">
+            <div class="truncate">
+                <h1 class="text-sm sm:text-xl font-bold tracking-wide leading-tight truncate">SWARNA</h1>
+                <!-- Subtitle disembunyikan di HP (hidden sm:block) agar tidak makan tempat -->
+                <p class="hidden sm:block text-[11px] text-emerald-200 truncate">Smart Farming Warnasari &bull; PPK Ormawa BEM Fakultas Saintek UMMI</p>
             </div>
         </div>
-    </header>
+
+        <!-- Tombol Aksi & Navigasi -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+            <a href="#profil-tim" class="bg-emerald-800 hover:bg-emerald-900 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg transition flex items-center">
+                <i class="fa-solid fa-users mr-1"></i> Tim kami
+            </a>
+
+            @auth
+                <!-- Khusus Operator -->
+                <a href="{{ route('export.csv') }}" class="bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg flex items-center shadow-sm transition">
+                    <i class="fa-solid fa-file-excel mr-1"></i>Export Data <span class="hidden xs:inline">Rekap</span>
+                </a>
+                <form action="{{ route('logout') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg transition flex items-center">
+                        <i class="fa-solid fa-right-from-bracket sm:mr-1"></i> <span class="hidden sm:inline">Logout</span>
+                    </button>
+                </form>
+            @else
+                <!-- Khusus Guest -->
+                <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-500 text-white text-[11px] sm:text-xs font-semibold px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg shadow-sm transition flex items-center">
+                    <i class="fa-solid fa-lock mr-1"></i> Login
+                </a>
+            @endauth
+        </div>
+
+    </div>
+</header>
 
     <main class="max-w-7xl mx-auto px-4 mt-6 space-y-6">
 
@@ -91,10 +111,19 @@
                     <h2 class="text-base md:text-lg font-bold text-slate-800">Kontrol Valve & Pompa</h2>
                     <p class="text-xs text-slate-500">Auto: Rata-rata &le;35% Buka, &ge;50% Tutup | Manual: Override Web</p>
                 </div>
-                <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg self-start sm:self-auto">
-                    <button id="btn_mode_auto" onclick="setMode('auto')" class="px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white">AUTO</button>
-                    <button id="btn_mode_manual" onclick="setMode('manual')" class="px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900">MANUAL</button>
-                </div>
+                
+                @auth
+                    <!-- Tombol Mode AUTO / MANUAL (Hanya Operator) -->
+                    <div class="flex items-center space-x-2 bg-slate-100 p-1 rounded-lg self-start sm:self-auto">
+                        <button id="btn_mode_auto" onclick="setMode('auto')" class="px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white">AUTO</button>
+                        <button id="btn_mode_manual" onclick="setMode('manual')" class="px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900">MANUAL</button>
+                    </div>
+                @else
+                    <!-- Tampilan Mode untuk Masyarakat Umum (Guest) -->
+                    <div class="px-3 py-1 text-xs font-bold rounded-md bg-slate-100 text-slate-500 border border-slate-200">
+                        🔒 Mode Publik (Ter-kunci)
+                    </div>
+                @endauth
             </div>
 
             <!-- Tombol Valve A - G -->
@@ -107,9 +136,18 @@
                         <div class="my-2">
                             <span id="badge_valve_{{ $block }}" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">OFF</span>
                         </div>
-                        <button id="btn_valve_{{ $block }}" onclick="toggleDevice('valve_{{ $block }}')" class="w-full py-1 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">
-                            Switch
-                        </button>
+                        
+                        @auth
+                            <!-- Sakelar Aktif untuk Operator -->
+                            <button id="btn_valve_{{ $block }}" onclick="toggleDevice('valve_{{ $block }}')" class="w-full py-1 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">
+                                Switch
+                            </button>
+                        @else
+                            <!-- Tampilan Saja untuk Guest -->
+                            <button disabled class="w-full py-1 text-xs font-semibold rounded bg-slate-100 text-slate-400 cursor-not-allowed">
+                                Read Only
+                            </button>
+                        @endauth
                     </div>
                     @endforeach
                 </div>
@@ -127,7 +165,11 @@
                                 <span id="badge_pump_water" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">OFF</span>
                             </div>
                         </div>
-                        <button id="btn_pump_water" onclick="toggleDevice('pump_water')" class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Switch</button>
+                        @auth
+                            <button id="btn_pump_water" onclick="toggleDevice('pump_water')" class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Switch</button>
+                        @else
+                            <button disabled class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-400 cursor-not-allowed">Read Only</button>
+                        @endauth
                     </div>
 
                     <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 flex items-center justify-between">
@@ -138,7 +180,11 @@
                                 <span id="badge_pump_fertilizer" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">OFF</span>
                             </div>
                         </div>
-                        <button id="btn_pump_fertilizer" onclick="toggleDevice('pump_fertilizer')" class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Switch</button>
+                        @auth
+                            <button id="btn_pump_fertilizer" onclick="toggleDevice('pump_fertilizer')" class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Switch</button>
+                        @else
+                            <button disabled class="px-4 py-1.5 text-xs font-semibold rounded bg-slate-100 text-slate-400 cursor-not-allowed">Read Only</button>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -204,25 +250,23 @@
             <!-- Grid 12 Anggota Tim -->
             <div>
                 <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wide mb-4 text-center">Struktur Anggota Tim</h3>
-    
-                <!-- Gunakan flex flex-wrap justify-center agar kartu otomatis berada di tengah -->
-                    <div class="flex flex-wrap justify-center gap-4">
-                        @foreach($members as $index => $m)
-                        <div class="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-0.75rem)] md:w-44 bg-slate-50 border border-slate-200 rounded-xl p-3 text-center flex flex-col items-center hover:shadow-md transition">
-                            <!-- Foto Anggota -->
-                            <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden mb-2.5 border-2 border-emerald-600 bg-slate-200">
-                                <img src="{{ asset('images/' . $m['foto']) }}" 
-                                     alt="{{ $m['nama'] }}" 
-                                  class="w-full h-full object-cover"
-                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($m['nama']) }}&background=047857&color=fff';">
-                            </div>
-                            <h4 class="text-xs font-bold text-slate-800 line-clamp-1">{{ $m['nama'] }}</h4>
-                                         <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">{{ $m['jabatan'] }}</p>
-                            <p class="text-[9px] text-slate-500 mt-0.5">{{ $m['jurusan'] }}</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    @foreach($members as $index => $m)
+                    <div class="w-[calc(50%-0.5rem)] sm:w-[calc(33.333%-0.75rem)] md:w-44 bg-slate-50 border border-slate-200 rounded-xl p-3 text-center flex flex-col items-center hover:shadow-md transition">
+                        <!-- Foto Anggota -->
+                        <div class="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden mb-2.5 border-2 border-emerald-600 bg-slate-200">
+                            <img src="{{ asset('images/' . $m['foto']) }}" 
+                                 alt="{{ $m['nama'] }}" 
+                                 class="w-full h-full object-cover"
+                                 onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ urlencode($m['nama']) }}&background=047857&color=fff';">
                         </div>
-                        @endforeach
+                        <h4 class="text-xs font-bold text-slate-800 line-clamp-1">{{ $m['nama'] }}</h4>
+                        <p class="text-[10px] text-emerald-700 font-semibold mt-0.5">{{ $m['jabatan'] }}</p>
+                        <p class="text-[9px] text-slate-500 mt-0.5">{{ $m['jurusan'] }}</p>
                     </div>
+                    @endforeach
                 </div>
+            </div>
         </section>
 
     </main>
@@ -259,7 +303,7 @@
                 const data = await res.json();
 
                 if (data.latest) {
-                    // Update Parameter & Status Suhu Air (Nomor 2)
+                    // Update Parameter & Status Suhu Air
                     const waterTemp = data.latest.water_temp || 0;
                     document.getElementById('val_water_temp').innerText = waterTemp + ' °C';
 
@@ -364,12 +408,15 @@
         function updateControlUI(control) {
             const btnAuto = document.getElementById('btn_mode_auto');
             const btnManual = document.getElementById('btn_mode_manual');
-            if (control.mode === 'auto') {
-                btnAuto.className = 'px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white';
-                btnManual.className = 'px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900';
-            } else {
-                btnManual.className = 'px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white';
-                btnAuto.className = 'px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900';
+            
+            if (btnAuto && btnManual) {
+                if (control.mode === 'auto') {
+                    btnAuto.className = 'px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white';
+                    btnManual.className = 'px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900';
+                } else {
+                    btnManual.className = 'px-3 py-1 text-xs font-bold rounded-md transition shadow-sm bg-emerald-600 text-white';
+                    btnAuto.className = 'px-3 py-1 text-xs font-bold rounded-md transition text-slate-600 hover:text-slate-900';
+                }
             }
 
             ['a','b','c','d','e','f','g'].forEach(b => {
@@ -380,11 +427,11 @@
                 if (isOn) {
                     badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
                     badge.innerText = 'ON / BUKA';
-                    btn.className = 'w-full py-1 text-xs font-semibold rounded bg-red-500 text-white hover:bg-red-600 transition';
+                    if (btn) btn.className = 'w-full py-1 text-xs font-semibold rounded bg-red-500 text-white hover:bg-red-600 transition';
                 } else {
                     badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600';
                     badge.innerText = 'OFF / TUTUP';
-                    btn.className = 'w-full py-1 text-xs font-semibold rounded bg-emerald-600 text-white hover:bg-emerald-700 transition';
+                    if (btn) btn.className = 'w-full py-1 text-xs font-semibold rounded bg-emerald-600 text-white hover:bg-emerald-700 transition';
                 }
             });
 
@@ -396,11 +443,11 @@
                 if (isOn) {
                     badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
                     badge.innerText = 'AKTIF (ON)';
-                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded bg-red-500 text-white hover:bg-red-600 transition';
+                    if (btn) btn.className = 'px-4 py-1.5 text-xs font-semibold rounded bg-red-500 text-white hover:bg-red-600 transition';
                 } else {
                     badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-600';
                     badge.innerText = 'MATI (OFF)';
-                    btn.className = 'px-4 py-1.5 text-xs font-semibold rounded bg-emerald-600 text-white hover:bg-emerald-700 transition';
+                    if (btn) btn.className = 'px-4 py-1.5 text-xs font-semibold rounded bg-emerald-600 text-white hover:bg-emerald-700 transition';
                 }
             });
         }

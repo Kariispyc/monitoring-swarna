@@ -45,6 +45,19 @@ class DashboardController extends Controller
         ]);
     }
 
+    // FUNGSI UNTUK MENGUBAH STATUS VALVE, POMPA, DAN MODE AUTO/MANUAL
+    public function updateControl(Request $request)
+    {
+        $control = DeviceControl::firstOrCreate(['id' => 1]);
+        $control->update($request->all());
+
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Status kontrol berhasil diperbarui',
+            'data'    => $control
+        ]);
+    }
+
     public function exportCsv(Request $request)
     {
         $days = $request->input('days', 7);
@@ -60,9 +73,17 @@ class DashboardController extends Controller
         ];
 
         $columns = [
-            'Waktu', 'Rata-rata Block A', 'Rata-rata Block B', 'Rata-rata Block C',
-            'Rata-rata Block D', 'Rata-rata Block E', 'Rata-rata Block F', 'Rata-rata Block G',
-            'Suhu Air (C)', 'Suhu Udara (C)', 'Kelembapan Udara (%)'
+            'Waktu',
+            'Rata-rata Block A',
+            'Rata-rata Block B',
+            'Rata-rata Block C',
+            'Rata-rata Block D',
+            'Rata-rata Block E',
+            'Rata-rata Block F',
+            'Rata-rata Block G',
+            'Suhu Air (C)',
+            'Suhu Udara (C)',
+            'Kelembapan Udara (%)'
         ];
 
         $callback = function () use ($logs, $columns) {
@@ -72,9 +93,16 @@ class DashboardController extends Controller
             foreach ($logs as $log) {
                 fputcsv($file, [
                     $log->created_at->format('Y-m-d H:i:s'),
-                    $log->avg_a, $log->avg_b, $log->avg_c,
-                    $log->avg_d, $log->avg_e, $log->avg_f, $log->avg_g,
-                    $log->water_temp, $log->air_temp, $log->air_humidity
+                    $log->avg_a,
+                    $log->avg_b,
+                    $log->avg_c,
+                    $log->avg_d,
+                    $log->avg_e,
+                    $log->avg_f,
+                    $log->avg_g,
+                    $log->water_temp,
+                    $log->air_temp,
+                    $log->air_humidity
                 ]);
             }
             fclose($file);
