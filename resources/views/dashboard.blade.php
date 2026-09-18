@@ -241,7 +241,7 @@
 
             <!-- Banner Foto Bersama Tim -->
             <div class="rounded-xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100">
-                <img src="{{ asset('images/foto-tim-bersama.jpg') }}" 
+                <img src="{{ asset('images/foto-tim-bersama.png') }}" 
                      alt="Foto Bersama Tim PPK Ormawa SWARNA" 
                      class="w-full h-48 md:h-80 object-cover"
                      onerror="this.onerror=null; this.src='https://placehold.co/1200x500/047857/ffffff?text=Foto+Bersama+Tim+PPK+Ormawa+SWARNA';">
