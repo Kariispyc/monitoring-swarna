@@ -235,7 +235,9 @@
                 </span>
                 <h2 class="text-xl md:text-2xl font-black text-slate-800">Tim Pelaksana SWARNA</h2>
                 <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
-                    Kami adalah tim pelaksana yang berhasil meraih pendanaan Program Penguatan Kapasitas Organisasi Ormawa melalui “INOVASI DESA SMART FARMING: INTEGRASI GREENHOUSE CERDAS BERBASIS IoT DAN PELATIHAN KOMPOS DI DESA WARNASARI”
+                    Melalui Program PPK Ormawa, mahasiswa menghadirkan inovasi Greenhouse Cerdas Berbasis Internet of Things (IoT) di Desa Warnasari sebagai upaya mendukung kelompok tani dalam menerapkan teknologi pertanian modern.
+Teknologi ini memungkinkan proses pemantauan kondisi tanaman dilakukan secara real time melalui sensor dan website monitoring. Selain itu, sistem penyiraman otomatis membantu menjaga kebutuhan air tanaman sehingga penggunaan sumber daya menjadi lebih efisien.
+
                 </p>
             </div>
 

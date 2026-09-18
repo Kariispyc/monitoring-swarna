@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SensorLog;
 use App\Models\DeviceControl;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DashboardController extends Controller
@@ -58,14 +59,31 @@ class DashboardController extends Controller
         ]);
     }
 
+    // EKSPOR CSV HARIAN (1 BARIS PER HARI)
     public function exportCsv(Request $request)
     {
-        $days = $request->input('days', 7);
-        $fileName = 'rekap_sensor_swarna_' . date('Y-m-d') . '.csv';
-        $logs = SensorLog::where('created_at', '>=', now()->subDays($days))->latest()->get();
+        $fileName = 'rekap_harian_swarna_' . date('Y-m-d') . '.csv';
+
+        // Query Agregasi Rata-rata Harian dari Model SensorLog
+        $logs = SensorLog::select(
+            DB::raw('DATE(created_at) as tanggal'),
+            DB::raw('ROUND(AVG(avg_a), 1) as block_a'),
+            DB::raw('ROUND(AVG(avg_b), 1) as block_b'),
+            DB::raw('ROUND(AVG(avg_c), 1) as block_c'),
+            DB::raw('ROUND(AVG(avg_d), 1) as block_d'),
+            DB::raw('ROUND(AVG(avg_e), 1) as block_e'),
+            DB::raw('ROUND(AVG(avg_f), 1) as block_f'),
+            DB::raw('ROUND(AVG(avg_g), 1) as block_g'),
+            DB::raw('ROUND(AVG(water_temp), 1) as suhu_air'),
+            DB::raw('ROUND(AVG(air_temp), 1) as suhu_udara'),
+            DB::raw('ROUND(AVG(air_humidity), 1) as kelembapan_udara')
+        )
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('tanggal', 'DESC')
+            ->get();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type"        => "text/csv; charset=UTF-8",
             "Content-Disposition" => "attachment; filename=$fileName",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
@@ -73,37 +91,42 @@ class DashboardController extends Controller
         ];
 
         $columns = [
-            'Waktu',
-            'Rata-rata Block A',
-            'Rata-rata Block B',
-            'Rata-rata Block C',
-            'Rata-rata Block D',
-            'Rata-rata Block E',
-            'Rata-rata Block F',
-            'Rata-rata Block G',
-            'Suhu Air (C)',
-            'Suhu Udara (C)',
+            'Tanggal',
+            'Rata-rata Block A (%)',
+            'Rata-rata Block B (%)',
+            'Rata-rata Block C (%)',
+            'Rata-rata Block D (%)',
+            'Rata-rata Block E (%)',
+            'Rata-rata Block F (%)',
+            'Rata-rata Block G (%)',
+            'Suhu Air (°C)',
+            'Suhu Udara (°C)',
             'Kelembapan Udara (%)'
         ];
 
         $callback = function () use ($logs, $columns) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+
+            // Tambahkan BOM UTF-8 agar Excel otomatis membaca format tulisan dan pemisah kolom
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Gunakan ';' sebagai delimiter agar otomatis terpisah per kolom di Excel Indonesia
+            fputcsv($file, $columns, ';');
 
             foreach ($logs as $log) {
                 fputcsv($file, [
-                    $log->created_at->format('Y-m-d H:i:s'),
-                    $log->avg_a,
-                    $log->avg_b,
-                    $log->avg_c,
-                    $log->avg_d,
-                    $log->avg_e,
-                    $log->avg_f,
-                    $log->avg_g,
-                    $log->water_temp,
-                    $log->air_temp,
-                    $log->air_humidity
-                ]);
+                    $log->tanggal,
+                    $log->block_a,
+                    $log->block_b,
+                    $log->block_c,
+                    $log->block_d,
+                    $log->block_e,
+                    $log->block_f,
+                    $log->block_g,
+                    $log->suhu_air,
+                    $log->suhu_udara,
+                    $log->kelembapan_udara
+                ], ';');
             }
             fclose($file);
         };
